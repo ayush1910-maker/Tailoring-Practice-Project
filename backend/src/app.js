@@ -16,11 +16,31 @@ app.use(cookieParser())
 
 // routes import
 import userRouter from "./routes/user.route.js"
+import orderRouter from "./routes/order.route.js"
+import adminRouter from "./routes/admin.route.js"
 
 // routes declaration
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/order", orderRouter)
+app.use("/api/v1/admin", adminRouter)
 
-// http://localhost:8000/api/v1/users/register
+// Error handling middleware
+import { ApiError } from "./utils/ApiError.js"
 
+app.use((err, req, res, next) => {
+    if (err instanceof ApiError) {
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message,
+            errors: err.errors
+        })
+    }
+    
+    // Default error
+    return res.status(500).json({
+        success: false,
+        message: err.message || "Internal Server Error"
+    })
+})
 
 export { app }
